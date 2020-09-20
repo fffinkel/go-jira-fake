@@ -26,6 +26,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	err = updateIssueWithEpicLink(jiraClient)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func createIssueWithEpicLink(cl *jira.Client) error {
@@ -40,6 +44,68 @@ func createIssueWithEpicLink(cl *jira.Client) error {
 	fmt.Printf("Type: %s\n", issue.Fields.Type.Name)
 	fmt.Printf("Priority: %s\n", issue.Fields.Priority.Name)
 	fmt.Printf("Status: %s\n", issue.Fields.Status.Name)
+	fmt.Printf("Unknowns: %+v\n", issue.Fields.Unknowns)
+
+	aaaahhhh, _ := json.MarshalIndent(issue.Fields.Unknowns, "", "\t")
+	fmt.Printf("\n\n----------> here's the bidness:\n%s\n", aaaahhhh)
+
+	userService := cl.User
+	me, _, _ := userService.GetSelf()
+
+	fieldList, _, _ := cl.Field.GetList()
+
+	var customFieldID string
+	for _, v := range fieldList {
+		if v.Name == "Epic Link" {
+			customFieldID = v.ID
+			break
+		}
+	}
+
+	var unknowns map[string]interface{}
+	unknowns = map[string]interface{}{
+		customFieldID: "FART-2",
+	}
+
+	i := jira.Issue{
+		Fields: &jira.IssueFields{
+			Description: "Test Issue",
+			Summary:     "Beep boop.",
+			Assignee:    me,
+			Reporter:    me,
+			Type: jira.IssueType{
+				Name: "Bug",
+			},
+			Project: jira.Project{
+				Key: "FART",
+			},
+			Unknowns: unknowns,
+		},
+	}
+
+	newIssue, _, _ := issueService.Create(&i)
+	aaaahhhh, _ = json.MarshalIndent(newIssue, "", "\t")
+	fmt.Printf("\n\n----------> here's the bidness:\n%s\n", aaaahhhh)
+
+	return nil
+}
+
+func updateIssueWithEpicLink(cl *jira.Client) error {
+	testIssueID := "FART-4"
+	issueService := cl.Issue
+	issue, _, err := issueService.Get(testIssueID, nil)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s: %+v\n", issue.Key, issue.Fields.Summary)
+	fmt.Printf("Type: %s\n", issue.Fields.Type.Name)
+	fmt.Printf("Priority: %s\n", issue.Fields.Priority.Name)
+	fmt.Printf("Status: %s\n", issue.Fields.Status.Name)
+	fmt.Printf("Unknowns: %+v\n", issue.Fields.Unknowns)
+
+	aaaahhhh, _ := json.MarshalIndent(issue.Fields.Unknowns, "", "\t")
+	fmt.Printf("\n\n----------> here's the bidness:\n%s\n", aaaahhhh)
 
 	userService := cl.User
 	me, _, _ := userService.GetSelf()
@@ -81,7 +147,7 @@ func createIssueWithEpicLink(cl *jira.Client) error {
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(response.Body)
-	aaaahhhh, _ := json.MarshalIndent(buf.String(), "", "\t")
+	aaaahhhh, _ = json.MarshalIndent(buf.String(), "", "\t")
 	fmt.Printf("\n\n----------> here's the bidness:\n%s\n", aaaahhhh)
 
 	return nil
