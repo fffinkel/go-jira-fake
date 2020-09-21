@@ -19,11 +19,17 @@ func main() {
 		tp.Client(),
 		"https://go-jira-finkel.atlassian.net/",
 	)
-	//updateIssueStatus(jiraClient.Issue)
-	err := createIssueWithEpicLink(jiraClient)
+
+	err := updateIssueStatus(jiraClient.Issue)
 	if err != nil {
 		panic(err)
 	}
+
+	err = createIssueWithEpicLink(jiraClient)
+	if err != nil {
+		panic(err)
+	}
+
 	err = updateIssueWithEpicLink(jiraClient)
 	if err != nil {
 		panic(err)
