@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -40,21 +39,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func searchIssues(cl *jira.Client) error {
-
-	opts := jira.SearchOptions{MaxResults: 0}
-
-	issues, resp, err := cl.Issue.Search(`project=FART`, &opts)
-
-	aaaahhhh, _ := json.MarshalIndent(resp, "", "\t")
-	fmt.Printf("\n\n----------> here's the bidness:\n%s\n", aaaahhhh)
-
-	if err != nil {
-		return err
-	}
-	fmt.Printf("NumIssues: %d, MaxResults: %d, Total: %d\n", len(issues), resp.MaxResults, resp.Total)
-
-	return nil
 }
